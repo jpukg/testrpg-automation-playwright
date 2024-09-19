@@ -103,7 +103,7 @@ test('automate character creation form', async ({ page }) => {
 
   await expect(adventureTyperSectionInput).toBeDisabled();
   await expect(fileInput).toBeDisabled();  
-  // await expect(button).toBeDisabled();
+  await expect(button).toBeDisabled();
   // await page.pause();
 
 });
