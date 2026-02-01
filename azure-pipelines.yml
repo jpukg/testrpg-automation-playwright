@@ -1,0 +1,42 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '20.x'
+  displayName: 'Install Node.js'
+
+- script: |
+    npm ci
+  displayName: 'Install dependencies'
+
+- script: |
+    npx playwright install --with-deps
+  displayName: 'Install Playwright Browsers'
+
+- script: |
+    npx playwright test --reporter=junit:test-results/results.xml,html:playwright-report
+  displayName: 'Run Playwright tests'
+  env:
+    CI: 'true'
+
+- task: PublishTestResults@2
+  displayName: 'Publish test results'
+  inputs:
+    searchFolder: 'test-results'
+    testResultsFormat: 'JUnit'
+    testResultsFiles: 'results.xml'
+    mergeTestResults: true
+    failTaskOnFailedTests: true
+  condition: succeededOrFailed()
+
+- task: PublishPipelineArtifact@1
+  inputs:
+    targetPath: 'playwright-report'
+    artifact: 'playwright-report'
+    publishLocation: 'pipeline'
+  condition: succeededOrFailed()
